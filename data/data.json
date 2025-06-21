@@ -1,0 +1,62 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "first_name": "Ankit",
+      "last_name": "Sharma",
+      "unique_employee_id": "EMP001",
+      "position": "Manager",
+      "department": "Inventory",
+      "joining_date": "2022-01-01",
+      "is_active": true,
+      "stock_threshold": 100
+    }
+  ],
+  "product_categories": [{ "id": 1, "name": "CLOTH LABEL" }, { "id": 2, "name": "PLASTIC BAGS" }],
+  "cloth_sizes": [
+    { "id": 1, "name": "S" },
+    { "id": 2, "name": "M" },
+    { "id": 3, "name": "L" },
+    { "id": 4, "name": "XL" },
+    { "id": 5, "name": "2XL" }
+  ],
+  "units": [{ "id": 1, "name": "pcs" }],
+  "products": [
+    {
+      "id": 1,
+      "name": "CLOTH LABEL (S) TOP",
+      "cloth_size_id": 1,
+      "category_id": 1,
+      "unit_id": 1,
+      "remarks": "Imported batch 1"
+    },
+    {
+      "id": 2,
+      "name": "PLASTIC BAGS (S)",
+      "cloth_size_id": 1,
+      "category_id": 2,
+      "unit_id": 1,
+      "remarks": "For packaging"
+    }
+  ],
+  "stock_entries": [
+    {
+      "id": 1,
+      "product_id": 1,
+      "entry_date": "2025-04-01",
+      "opening_quantity": 500,
+      "closing_balance": 393
+    }
+  ],
+  "production_orders": [
+    {
+      "id": 1,
+      "style_name": "JAMANA BLACK",
+      "order_date": "2025-03-20",
+      "notes": "Batch A",
+      "product_id": 1,
+      "stock_entry_id": 1,
+      "quantity_used": 107
+    }
+  ]
+}
