@@ -1,35 +1,118 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { inventoryData, getCategoryById, getSizeById, getUnitById, getStockByProductId } from "@/lib/data"
-import { Package, Search } from "lucide-react"
+import { Package, Search, Pencil, Trash2 } from "lucide-react"
 import { useAuthGuard } from "@/hooks/useAuthGuard"
+import { Button } from "@/components/ui/button"
+import AddProductModal from "@/components/Inventory/AddProductModal"
+import EditProductModal from "@/components/Inventory/EditProductModal"
+import ConfirmDeleteModal from "@/components/Inventory/ConfirmDeleteModal"
 
 export default function InventoryPage() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [products, setProducts] = useState<any[]>([])
+  const [stockEntries, setStockEntries] = useState<any[]>([])
+  const [editProduct, setEditProduct] = useState<any | null>(null)
+  const [deleteProduct, setDeleteProduct] = useState<any | null>(null)
   const { isAuthenticated, isLoading } = useAuthGuard()
-  
-    if (isLoading) {
-      return (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-        </div>
-      )
-    }
-  
-    if (!isAuthenticated) {
-      return null
-    }
 
-  const filteredProducts = inventoryData.products.filter((product) =>
+  // Fetch all products
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/api/products", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      const data = await res.json()
+      setProducts(data)
+    } catch (err) {
+      console.error("Failed to fetch products:", err)
+    }
+  }
+
+  // Fetch all stock entries
+  const fetchStockEntries = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/api/stock", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      const data = await res.json()
+      setStockEntries(data)
+    } catch (err) {
+      console.error("Failed to fetch stock entries:", err)
+    }
+  }
+
+  // Compute latest closing balance for a given product
+  const getLatestClosingBalance = (productId: number) => {
+    const entries = stockEntries
+      .filter((entry) => entry.product_id === productId)
+      .sort((a, b) => new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime())
+    return entries.length > 0 ? entries[0].closing_balance : 0
+  }
+
+  useEffect(() => {
+    fetchProducts()
+    fetchStockEntries()
+  }, [])
+
+  const handleEditSave = async (updatedProduct: any) => {
+    try {
+      const res = await fetch(`http://localhost:8000/api/products/${updatedProduct.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(updatedProduct),
+      })
+      if (res.ok) {
+        fetchProducts()
+        setEditProduct(null)
+      }
+    } catch (error) {
+      console.error("Failed to update product:", error)
+    }
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteProduct) return
+    try {
+      const res = await fetch(`http://localhost:8000/api/products/${deleteProduct.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      if (res.ok) {
+        fetchProducts()
+        setDeleteProduct(null)
+      }
+    } catch (error) {
+      console.error("Failed to delete product:", error)
+    }
+  }
+
+  const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600" />
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) return null
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -43,10 +126,11 @@ export default function InventoryPage() {
             <Package className="h-5 w-5" />
             <span>Product Inventory</span>
           </CardTitle>
-          <CardDescription>Complete overview of all products and their stock levels</CardDescription>
+          <CardDescription>Overview of all products and their current stock levels</CardDescription>
         </CardHeader>
+
         <CardContent>
-          <div className="flex items-center space-x-2 mb-6">
+          <div className="flex justify-between space-x-2 mb-6">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -56,37 +140,30 @@ export default function InventoryPage() {
                 className="pl-10"
               />
             </div>
+            <AddProductModal onProductAdded={fetchProducts} />
           </div>
 
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Product Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Size</TableHead>
                 <TableHead>Unit</TableHead>
                 <TableHead>Current Stock</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Remarks</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredProducts.map((product) => {
-                const category = getCategoryById(product.category_id)
-                const size = getSizeById(product.cloth_size_id)
-                const unit = getUnitById(product.unit_id)
-                const stock = getStockByProductId(product.id)
-                const currentStock = stock.length > 0 ? stock[stock.length - 1].closing_balance : 0
-                const isLowStock = currentStock < 100
+                const unit = product.unit || { name: "pcs" }
+                const currentStock = getLatestClosingBalance(product.id)
+                const isLowStock = currentStock < (product.stock_threshold || 100)
 
                 return (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{category?.name}</Badge>
-                    </TableCell>
-                    <TableCell>{size?.name}</TableCell>
-                    <TableCell>{unit?.name}</TableCell>
+                    <TableCell>{unit.name}</TableCell>
                     <TableCell>
                       <span className="font-medium">{currentStock.toLocaleString()}</span>
                     </TableCell>
@@ -96,6 +173,16 @@ export default function InventoryPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm text-gray-600">{product.remarks}</TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button size="sm" variant="outline" onClick={() => setEditProduct(product)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="destructive" onClick={() => setDeleteProduct(product)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 )
               })}
@@ -111,6 +198,21 @@ export default function InventoryPage() {
           )}
         </CardContent>
       </Card>
+
+      <EditProductModal
+        open={!!editProduct}
+        onClose={() => setEditProduct(null)}
+        onSave={handleEditSave}
+        product={editProduct}
+        units={products.map((p) => p.unit).filter((v, i, a) => v && a.findIndex(t => t.id === v.id) === i)}
+      />
+
+      <ConfirmDeleteModal
+        open={!!deleteProduct}
+        onClose={() => setDeleteProduct(null)}
+        onConfirm={handleDeleteConfirm}
+        productName={deleteProduct?.name || ""}
+      />
     </div>
   )
 }
