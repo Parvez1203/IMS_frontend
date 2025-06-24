@@ -8,32 +8,28 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { inventoryData, getCategoryById, getSizeById, getUnitById, getStockByProductId } from "@/lib/data"
 import { Package, Search } from "lucide-react"
+import { useAuthGuard } from "@/hooks/useAuthGuard"
 
 export default function InventoryPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
-  const router = useRouter()
-
-  useEffect(() => {
-    const auth = localStorage.getItem("isAuthenticated")
-    if (!auth) {
-      router.push("/")
-      return
+  const { isAuthenticated, isLoading } = useAuthGuard()
+  
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        </div>
+      )
     }
-    setIsAuthenticated(true)
-  }, [router])
+  
+    if (!isAuthenticated) {
+      return null
+    }
 
   const filteredProducts = inventoryData.products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
-  if (!isAuthenticated) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    )
-  }
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">

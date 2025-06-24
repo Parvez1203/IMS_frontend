@@ -14,25 +14,28 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { inventoryData, getProductById, getStockByProductId } from "@/lib/data"
 import { Package, Plus, Calendar } from "lucide-react"
+import { useAuthGuard } from "@/hooks/useAuthGuard"
 
 export default function AddStockPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState("")
   const [entryDate, setEntryDate] = useState(new Date().toISOString().split("T")[0])
   const [openingQuantity, setOpeningQuantity] = useState("")
   const [remarks, setRemarks] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
-  const router = useRouter()
+  const { isAuthenticated, isLoading } = useAuthGuard()
 
-  useEffect(() => {
-    const auth = localStorage.getItem("isAuthenticated")
-    if (!auth) {
-      router.push("/")
-      return
-    }
-    setIsAuthenticated(true)
-  }, [router])
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return null
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,14 +56,6 @@ export default function AddStockPage() {
   const selectedProductData = selectedProduct ? getProductById(Number.parseInt(selectedProduct)) : null
   const currentStock = selectedProductData ? getStockByProductId(selectedProductData.id) : []
   const currentBalance = currentStock.length > 0 ? currentStock[currentStock.length - 1].closing_balance : 0
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    )
-  }
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">

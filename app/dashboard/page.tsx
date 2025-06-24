@@ -6,25 +6,17 @@ import { StatsCards } from "@/components/dashboard/stats-cards"
 import { StockChart } from "@/components/dashboard/stock-chart"
 import { RecentActivity } from "@/components/dashboard/recent-activity"
 import { LowStockAlert } from "@/components/dashboard/low-stock-alert"
+import { jwtDecode } from "jwt-decode"
+import { useAuthGuard } from "@/hooks/useAuthGuard"
+
+type JwtPayload = {
+  id: number
+  unique_employee_id: string
+  exp: number
+}
 
 export default function DashboardPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
-
-  useEffect(() => {
-    const checkAuth = () => {
-      const auth = localStorage.getItem("isAuthenticated")
-      if (!auth) {
-        router.push("/")
-        return
-      }
-      setIsAuthenticated(true)
-      setIsLoading(false)
-    }
-
-    checkAuth()
-  }, [router])
+  const { isAuthenticated, isLoading } = useAuthGuard()
 
   if (isLoading) {
     return (

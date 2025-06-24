@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { LayoutDashboard, Package, ShoppingCart, Plus, User, Menu, X, LogOut } from "lucide-react"
+import { useAuthGuard } from "@/hooks/useAuthGuard"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -17,13 +18,8 @@ const navigation = [
 
 export function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { logout } = useAuthGuard()
   const pathname = usePathname()
-
-  const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated")
-    localStorage.removeItem("user")
-    window.location.href = "/"
-  }
 
   return (
     <>
@@ -90,7 +86,7 @@ export function Sidebar() {
           {/* Logout button */}
           <div className="p-4 border-t border-gray-200">
             <Button
-              onClick={handleLogout}
+              onClick={logout}
               variant="ghost"
               className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
             >

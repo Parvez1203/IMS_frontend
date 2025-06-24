@@ -15,9 +15,9 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { inventoryData, getProductById, getStockByProductId } from "@/lib/data"
 import { ShoppingCart, Plus, Calendar, Package } from "lucide-react"
+import { useAuthGuard } from "@/hooks/useAuthGuard"
 
 export default function OrdersPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [styleName, setStyleName] = useState("")
   const [orderDate, setOrderDate] = useState(new Date().toISOString().split("T")[0])
   const [selectedProduct, setSelectedProduct] = useState("")
@@ -26,16 +26,19 @@ export default function OrdersPage() {
   const [notes, setNotes] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
-  const router = useRouter()
-
-  useEffect(() => {
-    const auth = localStorage.getItem("isAuthenticated")
-    if (!auth) {
-      router.push("/")
-      return
+  const { isAuthenticated, isLoading } = useAuthGuard()
+  
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        </div>
+      )
     }
-    setIsAuthenticated(true)
-  }, [router])
+  
+    if (!isAuthenticated) {
+      return null
+    }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -9,11 +8,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, Mail, Lock, Package } from "lucide-react"
+import { Eye, EyeOff, Lock, Package, User } from "lucide-react"
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
-  const [email, setEmail] = useState("")
+  const [uniqueEmployeeId, setUniqueEmployeeId] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -24,28 +23,29 @@ export function LoginForm() {
     setError("")
     setIsLoading(true)
 
-    // Simple validation
-    if (!email || !password) {
+    if (!uniqueEmployeeId || !password) {
       setError("Please fill in all fields")
       setIsLoading(false)
       return
     }
 
-    // Mock authentication - in real app, this would be an API call
-    if (email === "ankit@inventory.com" && password === "password123") {
-      localStorage.setItem("isAuthenticated", "true")
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: 1,
-          name: "Ankit Sharma",
-          email: "ankit@inventory.com",
-          role: "Manager",
-        }),
-      )
+    try {
+      const res = await fetch("http://localhost:8000/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ unique_employee_id: uniqueEmployeeId, password }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.message || "Login failed")
+      }
+
+      localStorage.setItem("token", data.token)
       router.push("/dashboard")
-    } else {
-      setError("Invalid credentials. Use ankit@inventory.com / password123")
+    } catch (err: any) {
+      setError(err.message)
     }
 
     setIsLoading(false)
@@ -53,7 +53,7 @@ export function LoginForm() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left side - Hero section */}
+      {/* Left section */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10 flex flex-col justify-center px-12 text-white">
@@ -75,7 +75,7 @@ export function LoginForm() {
         <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-16 -mt-16" />
       </div>
 
-      {/* Right side - Login form */}
+      {/* Right section - Login form */}
       <div className="flex-1 flex items-center justify-center px-6 py-12 lg:px-8">
         <div className="w-full max-w-md">
           <div className="text-center mb-8 lg:hidden">
@@ -92,20 +92,21 @@ export function LoginForm() {
           <Card className="border-0 shadow-2xl">
             <CardHeader className="text-center pb-6">
               <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-              <CardDescription className="text-gray-600">Sign in to your inventory management account</CardDescription>
+              <CardDescription className="text-gray-600">
+                Sign in using your employee ID
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="unique_employee_id">Employee ID</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
-                      id="email"
-                      type="email"
-                      placeholder="ankit@inventory.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      id="unique_employee_id"
+                      placeholder="EMP00123"
+                      value={uniqueEmployeeId}
+                      onChange={(e) => setUniqueEmployeeId(e.target.value)}
                       className="pl-10 h-12"
                       required
                     />
@@ -119,7 +120,7 @@ export function LoginForm() {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="password123"
+                      placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-10 pr-10 h-12"
@@ -155,10 +156,6 @@ export function LoginForm() {
                   {isLoading ? "Signing in..." : "Sign in"}
                 </Button>
               </form>
-
-              <div className="mt-6 text-center text-sm text-gray-600">
-                Demo credentials: ankit@inventory.com / password123
-              </div>
             </CardContent>
           </Card>
         </div>

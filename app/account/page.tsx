@@ -12,9 +12,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
 import { inventoryData } from "@/lib/data"
 import { User, Mail, Lock, Save, Shield } from "lucide-react"
+import { useAuthGuard } from "@/hooks/useAuthGuard"
 
 export default function AccountPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
@@ -24,67 +24,43 @@ export default function AccountPage() {
   const [isUpdating, setIsUpdating] = useState(false)
   const [success, setSuccess] = useState("")
   const [error, setError] = useState("")
-  const router = useRouter()
+  const { isAuthenticated, isLoading, employeeId } = useAuthGuard()
+  const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    const auth = localStorage.getItem("isAuthenticated")
-    if (!auth) {
-      router.push("/")
-      return
+  const fetchUser = async () => {
+    const token = localStorage.getItem("token")
+    if (!token) return
+
+    try {
+      const res = await fetch(`http://localhost:8000/users/${employeeId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch user")
+      }
+
+      const data = await res.json()
+      setUser(data)
+      setFirstName(data.first_name || "")
+      setLastName(data.last_name || "")
+      setEmail(data.email || "ankit@inventory.com") // fallback
+    } catch (err) {
+      console.error("Error fetching user:", err)
     }
-    setIsAuthenticated(true)
-
-    // Load user data
-    const user = inventoryData.users[0]
-    setFirstName(user.first_name)
-    setLastName(user.last_name)
-    setEmail("ankit@inventory.com")
-  }, [router])
-
-  const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsUpdating(true)
-    setError("")
-    setSuccess("")
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    setSuccess("Profile updated successfully!")
-    setIsUpdating(false)
-    setTimeout(() => setSuccess(""), 3000)
   }
 
-  const handlePasswordUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsUpdating(true)
-    setError("")
-    setSuccess("")
-
-    if (newPassword !== confirmPassword) {
-      setError("New passwords don't match")
-      setIsUpdating(false)
-      return
-    }
-
-    if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters")
-      setIsUpdating(false)
-      return
-    }
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    setSuccess("Password updated successfully!")
-    setCurrentPassword("")
-    setNewPassword("")
-    setConfirmPassword("")
-    setIsUpdating(false)
-    setTimeout(() => setSuccess(""), 3000)
+  if (employeeId) {
+    fetchUser()
   }
+}, [employeeId])
 
-  if (!isAuthenticated) {
+
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -92,7 +68,100 @@ export default function AccountPage() {
     )
   }
 
-  const user = inventoryData.users[0]
+  if (!isAuthenticated) {
+    return null
+  }
+
+const handleProfileUpdate = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setIsUpdating(true)
+  setError("")
+  setSuccess("")
+
+  const token = localStorage.getItem("token")
+
+  try {
+    const res = await fetch(`http://localhost:8000/users/${employeeId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+      }),
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      setError(data.message || "Failed to update profile")
+    } else {
+      setSuccess("Profile updated successfully!")
+    }
+  } catch (err: any) {
+    setError("Something went wrong while updating profile.")
+    console.error(err)
+  }
+
+  setIsUpdating(false)
+  setTimeout(() => setSuccess(""), 3000)
+}
+
+const handlePasswordUpdate = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setIsUpdating(true)
+  setError("")
+  setSuccess("")
+
+  if (newPassword !== confirmPassword) {
+    setError("New passwords don't match")
+    setIsUpdating(false)
+    return
+  }
+
+  if (newPassword.length < 6) {
+    setError("Password must be at least 6 characters")
+    setIsUpdating(false)
+    return
+  }
+
+  const token = localStorage.getItem("token")
+
+  try {
+    const res = await fetch(`http://localhost:8000/users/${employeeId}/password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        currentPassword,
+        newPassword,
+      }),
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      setError(data.message || "Failed to update password")
+    } else {
+      setSuccess(data.message || "Password updated successfully!")
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+    }
+  } catch (err: any) {
+    setError("Something went wrong while updating password.")
+    console.error(err)
+  }
+
+  setIsUpdating(false)
+  setTimeout(() => setSuccess(""), 3000)
+}
+
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -139,17 +208,17 @@ export default function AccountPage() {
 
               <div className="space-y-2">
                 <Label>Employee ID</Label>
-                <Input value={user.unique_employee_id} disabled />
+                <Input value={user?.unique_employee_id} disabled />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Position</Label>
-                  <Input value={user.position} disabled />
+                  <Input value={user?.position} disabled />
                 </div>
                 <div className="space-y-2">
                   <Label>Department</Label>
-                  <Input value={user.department} disabled />
+                  <Input value={user?.department} disabled />
                 </div>
               </div>
 
@@ -226,14 +295,14 @@ export default function AccountPage() {
 
             <Separator className="my-6" />
 
-            <div className="space-y-3">
+            {/* <div className="space-y-3">
               <h4 className="text-sm font-medium">Stock Alert Threshold</h4>
               <div className="flex items-center space-x-2">
-                <Input type="number" value={user.stock_threshold} disabled className="w-20" />
+                <Input type="number" value={user?.stock_threshold} disabled className="w-20" />
                 <span className="text-sm text-gray-600">pieces</span>
               </div>
               <p className="text-xs text-gray-500">You'll receive alerts when stock falls below this threshold</p>
-            </div>
+            </div> */}
           </CardContent>
         </Card>
       </div>
