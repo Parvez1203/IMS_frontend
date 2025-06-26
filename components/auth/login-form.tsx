@@ -18,6 +18,8 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
+  const BaseUrl = process.env.BaseUrl || "http://localhost:3001";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
@@ -30,7 +32,7 @@ export function LoginForm() {
     }
 
     try {
-      const res = await fetch("http://localhost:8000/auth/login", {
+      const res = await fetch(`${BaseUrl}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ unique_employee_id: uniqueEmployeeId, password }),

@@ -25,11 +25,14 @@ export default function AddStockPage() {
   const [remarks, setRemarks] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [hasUpdatedBalances, setHasUpdatedBalances] = useState(false)
   const { isAuthenticated, isLoading } = useAuthGuard()
+
+  const BaseUrl = process.env.BaseUrl || "http://localhost:3001";
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/products", {
+      const res = await fetch(`${BaseUrl}/api/products`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -43,7 +46,7 @@ export default function AddStockPage() {
 
   const fetchClosingBalances = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/stock", {
+      const res = await fetch(`${BaseUrl}/api/stock`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -73,20 +76,21 @@ export default function AddStockPage() {
   }, [])
 
   useEffect(() => {
-    if (products.length > 0) {
+    if (products.length > 0 && !hasUpdatedBalances) {
       fetchClosingBalances()
+      setHasUpdatedBalances(true)
     }
-  }, [products])
+  }, [products, hasUpdatedBalances])
 
-  const selectedProduct = products.find((p) => p.id === Number(selectedProductId))
+  const selectedProduct = products?.find((p) => p.id === Number(selectedProductId))
   const currentBalance = selectedProduct?.closing_balance || 0
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     setIsSubmitting(true)
 
     try {
-      const res = await fetch("http://localhost:8000/api/stock", {
+      const res = await fetch(`${BaseUrl}/api/stock`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

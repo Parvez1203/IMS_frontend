@@ -27,36 +27,38 @@ export default function AccountPage() {
   const { isAuthenticated, isLoading, employeeId } = useAuthGuard()
   const [user, setUser] = useState<any>(null)
 
+  const BaseUrl = process.env.BaseUrl || "http://localhost:3001";
+
   useEffect(() => {
-  const fetchUser = async () => {
-    const token = localStorage.getItem("token")
-    if (!token) return
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token")
+      if (!token) return
 
-    try {
-      const res = await fetch(`http://localhost:8000/users/${employeeId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      try {
+        const res = await fetch(`${BaseUrl}/users/${employeeId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch user")
+        if (!res.ok) {
+          throw new Error("Failed to fetch user")
+        }
+
+        const data = await res.json()
+        setUser(data)
+        setFirstName(data.first_name || "")
+        setLastName(data.last_name || "")
+        setEmail(data.email || "ankit@inventory.com") // fallback
+      } catch (err) {
+        console.error("Error fetching user:", err)
       }
-
-      const data = await res.json()
-      setUser(data)
-      setFirstName(data.first_name || "")
-      setLastName(data.last_name || "")
-      setEmail(data.email || "ankit@inventory.com") // fallback
-    } catch (err) {
-      console.error("Error fetching user:", err)
     }
-  }
 
-  if (employeeId) {
-    fetchUser()
-  }
-}, [employeeId])
+    if (employeeId) {
+      fetchUser()
+    }
+  }, [employeeId])
 
 
 
@@ -72,95 +74,95 @@ export default function AccountPage() {
     return null
   }
 
-const handleProfileUpdate = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setIsUpdating(true)
-  setError("")
-  setSuccess("")
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsUpdating(true)
+    setError("")
+    setSuccess("")
 
-  const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token")
 
-  try {
-    const res = await fetch(`http://localhost:8000/users/${employeeId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        first_name: firstName,
-        last_name: lastName,
-        email,
-      }),
-    })
+    try {
+      const res = await fetch(`${BaseUrl}/users/${employeeId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          email,
+        }),
+      })
 
-    const data = await res.json()
+      const data = await res.json()
 
-    if (!res.ok) {
-      setError(data.message || "Failed to update profile")
-    } else {
-      setSuccess("Profile updated successfully!")
+      if (!res.ok) {
+        setError(data.message || "Failed to update profile")
+      } else {
+        setSuccess("Profile updated successfully!")
+      }
+    } catch (err: any) {
+      setError("Something went wrong while updating profile.")
+      console.error(err)
     }
-  } catch (err: any) {
-    setError("Something went wrong while updating profile.")
-    console.error(err)
-  }
 
-  setIsUpdating(false)
-  setTimeout(() => setSuccess(""), 3000)
-}
-
-const handlePasswordUpdate = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setIsUpdating(true)
-  setError("")
-  setSuccess("")
-
-  if (newPassword !== confirmPassword) {
-    setError("New passwords don't match")
     setIsUpdating(false)
-    return
+    setTimeout(() => setSuccess(""), 3000)
   }
 
-  if (newPassword.length < 6) {
-    setError("Password must be at least 6 characters")
-    setIsUpdating(false)
-    return
-  }
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsUpdating(true)
+    setError("")
+    setSuccess("")
 
-  const token = localStorage.getItem("token")
-
-  try {
-    const res = await fetch(`http://localhost:8000/users/${employeeId}/password`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        currentPassword,
-        newPassword,
-      }),
-    })
-
-    const data = await res.json()
-
-    if (!res.ok) {
-      setError(data.message || "Failed to update password")
-    } else {
-      setSuccess(data.message || "Password updated successfully!")
-      setCurrentPassword("")
-      setNewPassword("")
-      setConfirmPassword("")
+    if (newPassword !== confirmPassword) {
+      setError("New passwords don't match")
+      setIsUpdating(false)
+      return
     }
-  } catch (err: any) {
-    setError("Something went wrong while updating password.")
-    console.error(err)
-  }
 
-  setIsUpdating(false)
-  setTimeout(() => setSuccess(""), 3000)
-}
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters")
+      setIsUpdating(false)
+      return
+    }
+
+    const token = localStorage.getItem("token")
+
+    try {
+      const res = await fetch(`${BaseUrl}/users/${employeeId}/password`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.message || "Failed to update password")
+      } else {
+        setSuccess(data.message || "Password updated successfully!")
+        setCurrentPassword("")
+        setNewPassword("")
+        setConfirmPassword("")
+      }
+    } catch (err: any) {
+      setError("Something went wrong while updating password.")
+      console.error(err)
+    }
+
+    setIsUpdating(false)
+    setTimeout(() => setSuccess(""), 3000)
+  }
 
 
   return (

@@ -28,10 +28,13 @@ export default function EditProductModal({ open, onClose, onSave, product }: Pro
   const [units, setUnits] = useState<Unit[]>([])
   const [isSaving, setIsSaving] = useState(false)
 
+  const BaseUrl = process.env.BaseUrl || "http://localhost:3001";
+
+
   useEffect(() => {
     const fetchUnits = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/units", {
+        const res = await fetch(`${BaseUrl}/api/units`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },

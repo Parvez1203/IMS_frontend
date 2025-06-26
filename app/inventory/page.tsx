@@ -20,10 +20,12 @@ export default function InventoryPage() {
   const [deleteProduct, setDeleteProduct] = useState<any | null>(null)
   const { isAuthenticated, isLoading } = useAuthGuard()
 
+  const BaseUrl = process.env.BaseUrl || "http://localhost:3001";
+
   // Fetch all products
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/products", {
+      const res = await fetch(`${BaseUrl}/api/products`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -38,7 +40,7 @@ export default function InventoryPage() {
   // Fetch all stock entries
   const fetchStockEntries = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/stock", {
+      const res = await fetch(`${BaseUrl}/api/stock`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -65,7 +67,7 @@ export default function InventoryPage() {
 
   const handleEditSave = async (updatedProduct: any) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/products/${updatedProduct.id}`, {
+      const res = await fetch(`${BaseUrl}/api/products/${updatedProduct.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -85,7 +87,7 @@ export default function InventoryPage() {
   const handleDeleteConfirm = async () => {
     if (!deleteProduct) return
     try {
-      const res = await fetch(`http://localhost:8000/api/products/${deleteProduct.id}`, {
+      const res = await fetch(`${BaseUrl}/api/products/${deleteProduct.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

@@ -27,16 +27,18 @@ export default function AddProductModal({ onProductAdded }: AddProductModalProps
   const [units, setUnits] = useState<Unit[]>([])
   const { toast } = useToast()
 
+  const BaseUrl = process.env.BaseUrl || "http://localhost:3001";
+
   // Fetch units on mount
   useEffect(() => {
     const fetchUnits = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/units", {
+        const res = await fetch(`${BaseUrl}/api/units`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         })
-        
+
         if (!res.ok) throw new Error("Failed to fetch units")
         const data = await res.json()
         setUnits(data)
@@ -55,7 +57,7 @@ export default function AddProductModal({ onProductAdded }: AddProductModalProps
 
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch("http://localhost:8000/api/products", {
+      const res = await fetch(`${BaseUrl}/api/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
