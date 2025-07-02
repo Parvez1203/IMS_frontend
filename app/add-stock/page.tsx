@@ -23,6 +23,7 @@ export default function AddStockPage() {
     return nowIST.toISOString().split("T")[0]
   })
   const [openingQuantity, setOpeningQuantity] = useState("")
+  const [rate, setRate] = useState("")
   const [remarks, setRemarks] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -102,6 +103,7 @@ export default function AddStockPage() {
           entry_date: entryDate,
           opening_quantity: Number(openingQuantity),
           remarks,
+          rate: Number(rate),
         }),
       })
 
@@ -109,15 +111,17 @@ export default function AddStockPage() {
         const data = await res.json();
         setOpeningQuantity("")
         setRemarks("")
+        setRate("")
         setSelectedProductId("")
         const errorMessage = data.message || "Something went wrong!";
-        toast({ variant: "destructive", description: errorMessage })
+        toast({ variant: "destructive", description: "Failed to add" })
         return;
       }
 
       setSuccess(true)
       setOpeningQuantity("")
       setRemarks("")
+      setRate("")
       setSelectedProductId("")
       fetchClosingBalances() // refresh after new entry
     } catch (error) {
@@ -195,17 +199,32 @@ export default function AddStockPage() {
                 </div>
               </div>
 
-              <div>
-                <Label>Opening Quantity</Label>
-                <Input
-                  type="number"
-                  placeholder="Enter quantity"
-                  value={openingQuantity}
-                  onChange={(e) => setOpeningQuantity(e.target.value)}
-                  min="1"
-                  required
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Opening Quantity</Label>
+                  <Input
+                    type="number"
+                    placeholder="Enter quantity"
+                    value={openingQuantity}
+                    onChange={(e) => setOpeningQuantity(e.target.value)}
+                    min="1"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label>Rate</Label>
+                  <Input
+                    type="number"
+                    placeholder="₹ per unit"
+                    value={rate}
+                    onChange={(e) => setRate(e.target.value)}
+                    min="0"
+                    required
+                  />
+                </div>
               </div>
+
 
               <div>
                 <Label>Remarks (Optional)</Label>

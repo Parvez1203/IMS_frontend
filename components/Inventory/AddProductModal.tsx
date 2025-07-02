@@ -72,7 +72,17 @@ export default function AddProductModal({ onProductAdded }: AddProductModalProps
         }),
       })
 
-      if (!res.ok) return
+      if (!res.ok) {
+        const data = await res.json();
+        toast({ variant: "destructive", description: data.message || "Failed to add product" })
+        setOpen(false)
+        setName("")
+        setUnitId(units[0]?.id || null)
+        setRemarks("")
+        setStockThreshold("")
+        onProductAdded();
+        return;
+      }
 
       toast({ description: "Product added successfully!" })
       setOpen(false)
