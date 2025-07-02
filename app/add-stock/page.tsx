@@ -13,6 +13,7 @@ import { Package, Plus, Calendar } from "lucide-react"
 import { useAuthGuard } from "@/hooks/useAuthGuard"
 import { toast } from "@/components/ui/use-toast"
 
+
 export default function AddStockPage() {
   const [products, setProducts] = useState<any[]>([])
   const [selectedProductId, setSelectedProductId] = useState("")
@@ -104,7 +105,15 @@ export default function AddStockPage() {
         }),
       })
 
-      if (!res.ok) throw new Error("Failed to add stock")
+      if (!res.ok) {
+        const data = await res.json();
+        setOpeningQuantity("")
+        setRemarks("")
+        setSelectedProductId("")
+        const errorMessage = data.message || "Something went wrong!";
+        toast({ variant: "destructive", description: errorMessage })
+        return;
+      }
 
       setSuccess(true)
       setOpeningQuantity("")

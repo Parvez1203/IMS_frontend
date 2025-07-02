@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { Toast } from "../ui/toast"
 
 interface Unit {
   id: number
@@ -71,7 +72,7 @@ export default function AddProductModal({ onProductAdded }: AddProductModalProps
         }),
       })
 
-      if (!res.ok) throw new Error("Failed to add product")
+      if (!res.ok) return
 
       toast({ description: "Product added successfully!" })
       setOpen(false)
