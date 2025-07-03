@@ -27,7 +27,7 @@ export default function AccountPage() {
   const { isAuthenticated, isLoading, employeeId } = useAuthGuard()
   const [user, setUser] = useState<any>(null)
 
-  const BaseUrl = process.env.BaseUrl || "http://localhost:3001";
+  const BaseUrl = process.env.NEXT_PUBLIC_BaseUrl || "http://localhost:8000"
 
   useEffect(() => {
     const fetchUser = async () => {

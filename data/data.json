@@ -12,7 +12,12 @@
       "stock_threshold": 100
     }
   ],
-  "product_categories": [{ "id": 1, "name": "CLOTH LABEL" }, { "id": 2, "name": "PLASTIC BAGS" }],
+  "product_categories": [
+    { "id": 1, "name": "CLOTH LABEL" },
+    { "id": 2, "name": "PLASTIC BAGS" },
+    { "id": 3, "name": "BUTTONS" },
+    { "id": 4, "name": "THREADS" }
+  ],
   "cloth_sizes": [
     { "id": 1, "name": "S" },
     { "id": 2, "name": "M" },
@@ -20,7 +25,7 @@
     { "id": 4, "name": "XL" },
     { "id": 5, "name": "2XL" }
   ],
-  "units": [{ "id": 1, "name": "pcs" }],
+  "units": [{ "id": 1, "name": "pcs" }, { "id": 2, "name": "meters" }, { "id": 3, "name": "kg" }],
   "products": [
     {
       "id": 1,
@@ -37,26 +42,202 @@
       "category_id": 2,
       "unit_id": 1,
       "remarks": "For packaging"
+    },
+    {
+      "id": 3,
+      "name": "CLOTH LABEL (M) TOP",
+      "cloth_size_id": 2,
+      "category_id": 1,
+      "unit_id": 1,
+      "remarks": "Medium size labels"
+    },
+    {
+      "id": 4,
+      "name": "PLASTIC BUTTONS",
+      "cloth_size_id": null,
+      "category_id": 3,
+      "unit_id": 1,
+      "remarks": "White plastic buttons"
+    },
+    {
+      "id": 5,
+      "name": "COTTON THREAD",
+      "cloth_size_id": null,
+      "category_id": 4,
+      "unit_id": 2,
+      "remarks": "High quality cotton thread"
+    },
+    {
+      "id": 6,
+      "name": "PLASTIC BAGS (L)",
+      "cloth_size_id": 3,
+      "category_id": 2,
+      "unit_id": 1,
+      "remarks": "Large size packaging"
     }
   ],
   "stock_entries": [
     {
       "id": 1,
       "product_id": 1,
-      "entry_date": "2025-04-01",
+      "entry_date": "2024-12-01",
       "opening_quantity": 500,
       "closing_balance": 393
+    },
+    {
+      "id": 2,
+      "product_id": 2,
+      "entry_date": "2024-12-02",
+      "opening_quantity": 300,
+      "closing_balance": 250
+    },
+    {
+      "id": 3,
+      "product_id": 3,
+      "entry_date": "2024-12-03",
+      "opening_quantity": 400,
+      "closing_balance": 320
+    },
+    {
+      "id": 4,
+      "product_id": 4,
+      "entry_date": "2024-12-05",
+      "opening_quantity": 1000,
+      "closing_balance": 850
+    },
+    {
+      "id": 5,
+      "product_id": 5,
+      "entry_date": "2024-12-07",
+      "opening_quantity": 200,
+      "closing_balance": 180
+    },
+    {
+      "id": 6,
+      "product_id": 6,
+      "entry_date": "2024-12-10",
+      "opening_quantity": 150,
+      "closing_balance": 75
+    },
+    {
+      "id": 7,
+      "product_id": 1,
+      "entry_date": "2024-11-15",
+      "opening_quantity": 600,
+      "closing_balance": 500
+    },
+    {
+      "id": 8,
+      "product_id": 2,
+      "entry_date": "2024-11-20",
+      "opening_quantity": 400,
+      "closing_balance": 300
+    },
+    {
+      "id": 9,
+      "product_id": 3,
+      "entry_date": "2024-11-25",
+      "opening_quantity": 350,
+      "closing_balance": 400
+    },
+    {
+      "id": 10,
+      "product_id": 4,
+      "entry_date": "2024-10-30",
+      "opening_quantity": 800,
+      "closing_balance": 1000
     }
   ],
   "production_orders": [
     {
       "id": 1,
       "style_name": "JAMANA BLACK",
-      "order_date": "2025-03-20",
+      "order_date": "2024-12-15",
       "notes": "Batch A",
       "product_id": 1,
       "stock_entry_id": 1,
       "quantity_used": 107
+    },
+    {
+      "id": 2,
+      "style_name": "SUMMER COLLECTION",
+      "order_date": "2024-12-14",
+      "notes": "Batch B",
+      "product_id": 2,
+      "stock_entry_id": 2,
+      "quantity_used": 50
+    },
+    {
+      "id": 3,
+      "style_name": "WINTER SPECIAL",
+      "order_date": "2024-12-13",
+      "notes": "Premium quality",
+      "product_id": 3,
+      "stock_entry_id": 3,
+      "quantity_used": 80
+    },
+    {
+      "id": 4,
+      "style_name": "CASUAL WEAR",
+      "order_date": "2024-12-12",
+      "notes": "Regular batch",
+      "product_id": 4,
+      "stock_entry_id": 4,
+      "quantity_used": 150
+    },
+    {
+      "id": 5,
+      "style_name": "FORMAL COLLECTION",
+      "order_date": "2024-12-11",
+      "notes": "High-end products",
+      "product_id": 5,
+      "stock_entry_id": 5,
+      "quantity_used": 20
+    },
+    {
+      "id": 6,
+      "style_name": "SPORTS WEAR",
+      "order_date": "2024-12-10",
+      "notes": "Athletic collection",
+      "product_id": 6,
+      "stock_entry_id": 6,
+      "quantity_used": 75
+    },
+    {
+      "id": 7,
+      "style_name": "ETHNIC WEAR",
+      "order_date": "2024-11-28",
+      "notes": "Traditional designs",
+      "product_id": 1,
+      "stock_entry_id": 7,
+      "quantity_used": 100
+    },
+    {
+      "id": 8,
+      "style_name": "PARTY COLLECTION",
+      "order_date": "2024-11-25",
+      "notes": "Festive season",
+      "product_id": 2,
+      "stock_entry_id": 8,
+      "quantity_used": 100
+    },
+    {
+      "id": 9,
+      "style_name": "OFFICE WEAR",
+      "order_date": "2024-11-20",
+      "notes": "Professional attire",
+      "product_id": 3,
+      "stock_entry_id": 9,
+      "quantity_used": 50
+    },
+    {
+      "id": 10,
+      "style_name": "KIDS COLLECTION",
+      "order_date": "2024-10-15",
+      "notes": "Children's clothing",
+      "product_id": 4,
+      "stock_entry_id": 10,
+      "quantity_used": 200
     }
   ]
 }

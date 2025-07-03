@@ -2,24 +2,28 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { LayoutDashboard, Package, ShoppingCart, Plus, User, Menu, X, LogOut } from "lucide-react"
-import { useAuthGuard } from "@/hooks/useAuthGuard"
+import { LayoutDashboard, Package, ShoppingCart, Plus, User, Menu, X, LogOut, FileText } from "lucide-react"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Add Stock", href: "/add-stock", icon: Plus },
   { name: "Orders", href: "/orders", icon: ShoppingCart },
   { name: "Inventory", href: "/inventory", icon: Package },
+  { name: "Reports", href: "/reports", icon: FileText },
   { name: "Account", href: "/account", icon: User },
 ]
 
 export function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const { logout } = useAuthGuard()
+  const router = useRouter()
   const pathname = usePathname()
+
+  const handleLogout = () => {
+    router.push("/")
+  }
 
   return (
     <>
@@ -86,7 +90,7 @@ export function Sidebar() {
           {/* Logout button */}
           <div className="p-4 border-t border-gray-200">
             <Button
-              onClick={logout}
+              onClick={handleLogout}
               variant="ghost"
               className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
             >

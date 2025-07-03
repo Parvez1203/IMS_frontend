@@ -30,7 +30,7 @@ export default function AddStockPage() {
   const [hasUpdatedBalances, setHasUpdatedBalances] = useState(false)
   const { isAuthenticated, isLoading } = useAuthGuard()
 
-  const BaseUrl = process.env.BaseUrl || "http://localhost:3001";
+  const BaseUrl = process.env.NEXT_PUBLIC_BaseUrl || "http://localhost:8000"
 
   const fetchProducts = async () => {
     try {

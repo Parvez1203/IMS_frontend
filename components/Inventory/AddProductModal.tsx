@@ -28,7 +28,7 @@ export default function AddProductModal({ onProductAdded }: AddProductModalProps
   const [units, setUnits] = useState<Unit[]>([])
   const { toast } = useToast()
 
-  const BaseUrl = process.env.BaseUrl || "http://localhost:3001";
+  const BaseUrl = process.env.NEXT_PUBLIC_BaseUrl || "http://localhost:8000"
 
   // Fetch units on mount
   useEffect(() => {

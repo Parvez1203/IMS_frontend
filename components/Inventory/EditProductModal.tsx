@@ -28,7 +28,7 @@ export default function EditProductModal({ open, onClose, onSave, product }: Pro
   const [units, setUnits] = useState<Unit[]>([])
   const [isSaving, setIsSaving] = useState(false)
 
-  const BaseUrl = process.env.BaseUrl || "http://localhost:3001";
+  const BaseUrl = process.env.NEXT_PUBLIC_BaseUrl || "http://localhost:8000"
 
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function EditProductModal({ open, onClose, onSave, product }: Pro
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         })
-
+        
         if (!res.ok) throw new Error("Failed to fetch units")
         const data = await res.json()
         setUnits(data)
