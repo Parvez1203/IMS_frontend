@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ShoppingCart, Plus, Calendar, Package } from "lucide-react"
 import { useAuthGuard } from "@/hooks/useAuthGuard"
+import toast from 'react-hot-toast';
 
 export default function OrdersPage() {
   const [styleName, setStyleName] = useState("")
@@ -87,7 +88,7 @@ export default function OrdersPage() {
         })
       })
 
-      if (!res.ok) throw new Error("Failed to create order")
+      if (!res.ok) toast.error("Failed to create order")
       const newOrder = await res.json()
       setOrders((prev) => [newOrder, ...prev])
 
@@ -155,23 +156,7 @@ export default function OrdersPage() {
                   </SelectContent>
                 </Select>
               </div>
-              {availableStockEntries.length > 0 && (
-                <div className="space-y-2">
-                  <Label>Stock Entry</Label>
-                  <Select value={selectedStockEntry} onValueChange={setSelectedStockEntry}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select stock entry" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableStockEntries.map((entry) => (
-                        <SelectItem key={entry.id} value={entry.id.toString()}>
-                          {entry.entry_date} - {entry.closing_balance} pcs
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+
               <div className="space-y-2">
                 <Label htmlFor="quantity">Quantity Used</Label>
                 <Input id="quantity" type="number" value={quantityUsed} onChange={(e) => setQuantityUsed(e.target.value)} min="1" required />

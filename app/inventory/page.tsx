@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import AddProductModal from "@/components/Inventory/AddProductModal"
 import EditProductModal from "@/components/Inventory/EditProductModal"
 import ConfirmDeleteModal from "@/components/Inventory/ConfirmDeleteModal"
+import toast from 'react-hot-toast';
 
 export default function InventoryPage() {
   const [searchTerm, setSearchTerm] = useState("")

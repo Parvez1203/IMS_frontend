@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Package, Plus, Calendar } from "lucide-react"
 import { useAuthGuard } from "@/hooks/useAuthGuard"
-import { toast } from "@/components/ui/use-toast"
+import toast from 'react-hot-toast';
 
 
 export default function AddStockPage() {
@@ -42,7 +42,7 @@ export default function AddStockPage() {
       const data = await res.json()
       setProducts(data)
     } catch (error) {
-      toast({ variant: "destructive", description: "Failed to fetch products." })
+      toast.error("Failed to fetch products.")
     }
   }
 
@@ -69,7 +69,7 @@ export default function AddStockPage() {
         }))
       )
     } catch (error) {
-      toast({ variant: "destructive", description: "Failed to fetch stock balances." })
+      toast.error("Failed to fetch stock balances.")
     }
   }
 
@@ -114,7 +114,7 @@ export default function AddStockPage() {
         setRate("")
         setSelectedProductId("")
         const errorMessage = data.message || "Something went wrong!";
-        toast({ variant: "destructive", description: "Failed to add" })
+        toast.error("Failed to add")
         return;
       }
 
@@ -125,7 +125,7 @@ export default function AddStockPage() {
       setSelectedProductId("")
       fetchClosingBalances() // refresh after new entry
     } catch (error) {
-      toast({ variant: "destructive", description: "Error adding stock entry." })
+      toast.error("Error adding stock entry.")
     } finally {
       setIsSubmitting(false)
       setTimeout(() => setSuccess(false), 3000)

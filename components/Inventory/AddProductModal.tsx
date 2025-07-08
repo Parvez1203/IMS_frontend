@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { Toast } from "../ui/toast"
+import toast from 'react-hot-toast';
 
 interface Unit {
   id: number
@@ -26,7 +25,6 @@ export default function AddProductModal({ onProductAdded }: AddProductModalProps
   const [remarks, setRemarks] = useState("")
   const [stockThreshold, setStockThreshold] = useState("100")
   const [units, setUnits] = useState<Unit[]>([])
-  const { toast } = useToast()
 
   const BaseUrl = process.env.NEXT_PUBLIC_BaseUrl || "http://localhost:3001"
 
@@ -45,7 +43,7 @@ export default function AddProductModal({ onProductAdded }: AddProductModalProps
         setUnits(data)
         if (data.length > 0) setUnitId(data[0].id)
       } catch (err) {
-        toast({ variant: "destructive", description: "Error fetching units" })
+        toast.error("Error fetching units")
         console.error(err)
       }
     }
@@ -74,7 +72,7 @@ export default function AddProductModal({ onProductAdded }: AddProductModalProps
 
       if (!res.ok) {
         const data = await res.json();
-        toast({ variant: "destructive", description: data.message || "Failed to add product" })
+        toast.error(data.message || "Failed to add product")
         setOpen(false)
         setName("")
         setUnitId(units[0]?.id || null)
@@ -84,7 +82,7 @@ export default function AddProductModal({ onProductAdded }: AddProductModalProps
         return;
       }
 
-      toast({ description: "Product added successfully!" })
+      toast.success("Product added successfully!")
       setOpen(false)
       setName("")
       setUnitId(units[0]?.id || null)
@@ -92,7 +90,7 @@ export default function AddProductModal({ onProductAdded }: AddProductModalProps
       setStockThreshold("")
       onProductAdded()
     } catch (err) {
-      toast({ variant: "destructive", description: "Failed to add product" })
+      toast.error("Failed to add product")
       console.error(err)
     }
   }
