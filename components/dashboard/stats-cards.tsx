@@ -3,18 +3,24 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Package, TrendingUp, AlertTriangle, Clock } from "lucide-react"
-import { inventoryData, getTotalStock, getLowStockProducts, getRecentStockEntries } from "@/lib/data"
 
-export function StatsCards() {
-  const totalStock = getTotalStock()
-  const lowStockItems = getLowStockProducts(100)
-  const recentEntries = getRecentStockEntries()
-  const totalProducts = inventoryData.products.length
+type StatsCardsProps = {
+  totalProducts: number
+  totalStock: number
+  lowStockCount: number
+  recentEntriesCount: number
+}
 
+export function StatsCards({
+  totalProducts,
+  totalStock,
+  lowStockCount,
+  recentEntriesCount,
+}: StatsCardsProps) {
   const stats = [
     {
       title: "Total Products",
-      value: totalProducts.toString(),
+      value: totalProducts?.toString() || "0",
       icon: Package,
       trend: "+12%",
       trendUp: true,
@@ -22,7 +28,7 @@ export function StatsCards() {
     },
     {
       title: "Total Stock",
-      value: totalStock.toLocaleString(),
+      value: totalStock?.toLocaleString() || "0",
       icon: TrendingUp,
       trend: "+8%",
       trendUp: true,
@@ -30,15 +36,15 @@ export function StatsCards() {
     },
     {
       title: "Low Stock Alerts",
-      value: lowStockItems.length.toString(),
+      value: lowStockCount.toString() || "0",
       icon: AlertTriangle,
-      trend: lowStockItems.length > 0 ? "Attention needed" : "All good",
-      trendUp: lowStockItems.length === 0,
+      trend: lowStockCount > 0 ? "Attention needed" : "All good",
+      trendUp: lowStockCount === 0,
       description: "Items below threshold",
     },
     {
       title: "Recent Entries",
-      value: recentEntries.length.toString(),
+      value: recentEntriesCount.toString(),
       icon: Clock,
       trend: "This week",
       trendUp: true,

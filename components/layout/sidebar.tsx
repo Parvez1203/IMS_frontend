@@ -9,9 +9,9 @@ import { LayoutDashboard, Package, ShoppingCart, Plus, User, Menu, X, LogOut, Fi
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Inventory", href: "/inventory", icon: Package },
   { name: "Add Stock", href: "/add-stock", icon: Plus },
   { name: "Orders", href: "/orders", icon: ShoppingCart },
-  { name: "Inventory", href: "/inventory", icon: Package },
   { name: "Reports", href: "/reports", icon: FileText },
   { name: "Account", href: "/account", icon: User },
 ]

@@ -18,7 +18,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  const BaseUrl = process.env.NEXT_PUBLIC_BaseUrl || "http://localhost:5000";
+  const BaseUrl = process.env.NEXT_PUBLIC_BaseUrl || "http://localhost:3001";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

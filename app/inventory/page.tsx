@@ -20,7 +20,7 @@ export default function InventoryPage() {
   const [deleteProduct, setDeleteProduct] = useState<any | null>(null)
   const { isAuthenticated, isLoading } = useAuthGuard()
 
-  const BaseUrl = process.env.NEXT_PUBLIC_BaseUrl || "http://localhost:8000"
+  const BaseUrl = process.env.NEXT_PUBLIC_BaseUrl || "http://localhost:3001"
 
   // Fetch all products
   const fetchProducts = async () => {

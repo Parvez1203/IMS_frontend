@@ -35,7 +35,7 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState([])
   const { isAuthenticated, isLoading } = useAuthGuard()
 
-  const BaseUrl = process.env.NEXT_PUBLIC_BaseUrl || "http://localhost:8000"
+  const BaseUrl = process.env.NEXT_PUBLIC_BaseUrl || "http://localhost:3001"
 
   useEffect(() => {
     const fetchData = async () => {
